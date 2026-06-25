@@ -29,6 +29,26 @@ function isBot(userAgent) {
 }
 
 // ==========================================
+// 0. DEEP LINK VERIFICATION (Android App Links)
+// ==========================================
+app.get('/.well-known/assetlinks.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(`[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sooqcom.app",
+      "sha256_cert_fingerprints": [
+        "11:06:17:93:E6:52:6B:76:C6:4D:F0:E2:BB:6B:B1:33:DC:71:0D:46:2D:0F:7C:4A:A1:35:20:4B:40:70:4F:57",
+        "C0:A8:DE:BD:FC:F6:16:08:74:7F:E2:BD:06:79:33:49:F6:9B:73:8F:84:1B:2C:82:A3:EE:08:AA:6E:41:08:9B"
+      ]
+    }
+  }
+]`);
+});
+
+// ==========================================
 // 1. DYNAMIC HTML ENDPOINT (Returns OG Tags)
 // ==========================================
 app.get('/ad/:id', async (req, res) => {
