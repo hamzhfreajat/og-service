@@ -6,7 +6,7 @@ const { createCanvas, loadImage } = require('canvas');
 const app = express();
 app.use(cors());
 
-const API_BASE = 'https://api.sooq-com.com';
+const API_BASE = 'https://api.sooq-com.com/api';
 const MAIN_SITE = 'https://sooq-com.com';
 const SHARE_DOMAIN = 'https://share.sooq-com.com';
 
