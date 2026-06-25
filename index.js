@@ -264,13 +264,19 @@ app.get('/image/:id.jpg', async (req, res) => {
     } catch (error) {
         console.error(`Failed to generate image for ad ${id}:`, error.message);
         
-        // Fallback: Send empty white canvas to prevent breaking the request
+        // Fallback: Send white canvas with text to prevent black square
         const emptyCanvas = createCanvas(1200, 630);
         const ctx = emptyCanvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#f0f2f5';
         ctx.fillRect(0, 0, 1200, 630);
+        ctx.fillStyle = '#00B2FF';
+        ctx.font = 'bold 80px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('سوقكم - Sooqcom', 600, 315);
+        
         res.setHeader('Content-Type', 'image/jpeg');
-        emptyCanvas.createJPEGStream().pipe(res);
+        emptyCanvas.createJPEGStream({ quality: 0.9 }).pipe(res);
     }
 });
 
@@ -313,8 +319,17 @@ app.get('/image/category/:id.jpg', async (req, res) => {
     } catch (error) {
         console.error(`Failed to generate image for cat ${id}:`, error.message);
         const emptyCanvas = createCanvas(1200, 630);
+        const ctx = emptyCanvas.getContext('2d');
+        ctx.fillStyle = '#f0f2f5';
+        ctx.fillRect(0, 0, 1200, 630);
+        ctx.fillStyle = '#00B2FF';
+        ctx.font = 'bold 80px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('سوقكم', 600, 270);
+        
         res.setHeader('Content-Type', 'image/jpeg');
-        emptyCanvas.createJPEGStream().pipe(res);
+        emptyCanvas.createJPEGStream({ quality: 0.9 }).pipe(res);
     }
 });
 
