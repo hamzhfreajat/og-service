@@ -61,7 +61,8 @@ app.get('/ad/:id', async (req, res) => {
         // Aggressively break out of Messenger WebView on Android
         if (userAgent.toLowerCase().includes('android')) {
             const domainAndPath = redirectUrl.replace(/^https?:\/\//, '');
-            const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(redirectUrl)};end`;
+            const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
+            const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             return res.redirect(302, intentUrl);
         }
         return res.redirect(302, redirectUrl);
@@ -150,7 +151,8 @@ app.get('/category/:id', async (req, res) => {
         // Aggressively break out of Messenger WebView on Android
         if (userAgent.toLowerCase().includes('android')) {
             const domainAndPath = redirectUrl.replace(/^https?:\/\//, '');
-            const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(redirectUrl)};end`;
+            const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
+            const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             return res.redirect(302, intentUrl);
         }
         return res.redirect(302, redirectUrl);
