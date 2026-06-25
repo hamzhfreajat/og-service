@@ -195,7 +195,19 @@ app.get('/image/:id.jpg', async (req, res) => {
         });
         
         const ad = response.data.data || response.data.ad || response.data;
-        const images = ad.images || []; // Expecting an array of URL strings
+        
+        let images = [];
+        if (ad.attributes && Array.isArray(ad.attributes.images) && ad.attributes.images.length > 0) {
+            images = ad.attributes.images;
+        } else if (ad.image_urls && Array.isArray(ad.image_urls) && ad.image_urls.length > 0) {
+            images = ad.image_urls;
+        } else if (ad.image_url && typeof ad.image_url === 'string') {
+            try {
+                images = JSON.parse(ad.image_url);
+            } catch (e) {
+                images = [ad.image_url];
+            }
+        }
 
         // Standard Open Graph Image Size: 1200x630
         const canvas = createCanvas(1200, 630);
