@@ -74,8 +74,31 @@ app.get('/ad/:id', async (req, res) => {
         res.send(html);
     } catch (error) {
         console.error(`Failed to fetch ad ${id} for HTML:`, error.message);
-        // Fallback gracefully: redirect user to the website anyway
-        res.redirect(`${MAIN_SITE}/ad/${id}`);
+        // Fallback: Return generic HTML so Messenger still unfurls it
+        const title = 'إعلان على سوقكم';
+        const description = 'شاهد تفاصيل هذا الإعلان على موقع سوقكم';
+        const imageUrl = `${SHARE_DOMAIN}/image/${id}.jpg`;
+        const redirectUrl = `${MAIN_SITE}/ad/${id}`;
+        
+        const fallbackHtml = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${redirectUrl}">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${description}">
+    <meta property="og:image" content="${imageUrl}">
+    <meta http-equiv="refresh" content="0;url=${redirectUrl}">
+    <script>window.location.replace("${redirectUrl}");</script>
+</head>
+<body><script>window.location.replace("${redirectUrl}");</script></body>
+</html>
+        `;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(fallbackHtml);
     }
 });
 
@@ -125,7 +148,30 @@ app.get('/category/:id', async (req, res) => {
         res.send(html);
     } catch (error) {
         console.error(`Failed to fetch cat ${id} for HTML:`, error.message);
-        res.redirect(redirectUrl);
+        // Fallback generic HTML
+        const title = 'قسم على سوقكم';
+        const description = 'تصفح الإعلانات في هذا القسم على سوقكم';
+        const imageUrl = `${SHARE_DOMAIN}/image/category/${id}.jpg`;
+        
+        const fallbackHtml = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${redirectUrl}">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${description}">
+    <meta property="og:image" content="${imageUrl}">
+    <meta http-equiv="refresh" content="0;url=${redirectUrl}">
+    <script>window.location.replace("${redirectUrl}");</script>
+</head>
+<body><script>window.location.replace("${redirectUrl}");</script></body>
+</html>
+        `;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(fallbackHtml);
     }
 });
 
