@@ -10,11 +10,36 @@ const API_BASE = 'https://api.sooq-com.com';
 const MAIN_SITE = 'https://sooq-com.com';
 const SHARE_DOMAIN = 'https://share.sooq-com.com';
 
+// Detect if the request is from a social media crawler
+function isBot(userAgent) {
+    if (!userAgent) return false;
+    const bots = [
+        'facebookexternalhit',
+        'WhatsApp',
+        'Twitterbot',
+        'LinkedInBot',
+        'Pinterest',
+        'SkypeUriPreview',
+        'TelegramBot',
+        'Viber',
+        'Discordbot',
+        'Slackbot'
+    ];
+    return bots.some(bot => userAgent.toLowerCase().includes(bot.toLowerCase()));
+}
+
 // ==========================================
 // 1. DYNAMIC HTML ENDPOINT (Returns OG Tags)
 // ==========================================
 app.get('/ad/:id', async (req, res) => {
     const { id } = req.params;
+    const userAgent = req.headers['user-agent'];
+    const redirectUrl = `${MAIN_SITE}/ad/${id}`;
+    
+    // If it's a real user, instantly redirect them!
+    if (!isBot(userAgent)) {
+        return res.redirect(302, redirectUrl);
+    }
     
     try {
         // Fetch ad details securely
@@ -38,10 +63,7 @@ app.get('/ad/:id', async (req, res) => {
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    
-    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="${redirectUrl}">
     <meta property="og:title" content="${title}">
@@ -49,24 +71,13 @@ app.get('/ad/:id', async (req, res) => {
     <meta property="og:image" content="${imageUrl}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="${redirectUrl}">
     <meta property="twitter:title" content="${title}">
     <meta property="twitter:description" content="${description}">
     <meta property="twitter:image" content="${imageUrl}">
-
-    <!-- Redirect Real Users immediately -->
-    <meta http-equiv="refresh" content="0;url=${redirectUrl}">
-    <script>
-        window.location.replace("${redirectUrl}");
-    </script>
 </head>
-<body style="font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 50px;">
-    <h2>جاري تحويلك إلى الإعلان...</h2>
-    <p><a href="${redirectUrl}">انقر هنا إذا لم يتم تحويلك تلقائياً</a></p>
-</body>
+<body></body>
 </html>
         `;
         
@@ -91,10 +102,8 @@ app.get('/ad/:id', async (req, res) => {
     <meta property="og:title" content="${title}">
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${imageUrl}">
-    <meta http-equiv="refresh" content="0;url=${redirectUrl}">
-    <script>window.location.replace("${redirectUrl}");</script>
 </head>
-<body><script>window.location.replace("${redirectUrl}");</script></body>
+<body></body>
 </html>
         `;
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -104,10 +113,16 @@ app.get('/ad/:id', async (req, res) => {
 
 app.get('/category/:id', async (req, res) => {
     const { id } = req.params;
+    const userAgent = req.headers['user-agent'];
     
     // We get query params so we can pass them along (e.g. filters)
     const queryString = req.url.substring(req.url.indexOf('?'));
-    const redirectUrl = `${MAIN_SITE}/category/${id}${queryString !== req.url ? queryString : ''}`;
+    const redirectUrl = `${MAIN_SITE}/category/${id}${queryString !== req.url && queryString !== '-1' ? queryString : ''}`;
+    
+    // If it's a real user, instantly redirect them!
+    if (!isBot(userAgent)) {
+        return res.redirect(302, redirectUrl);
+    }
     
     try {
         const response = await axios.get(`${API_BASE}/categories/${id}`, {
@@ -134,13 +149,8 @@ app.get('/category/:id', async (req, res) => {
     <meta property="og:image" content="${imageUrl}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta http-equiv="refresh" content="0;url=${redirectUrl}">
-    <script>window.location.replace("${redirectUrl}");</script>
 </head>
-<body style="font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 50px;">
-    <h2>جاري تحويلك...</h2>
-    <p><a href="${redirectUrl}">انقر هنا</a></p>
-</body>
+<body></body>
 </html>
         `;
         
@@ -164,10 +174,8 @@ app.get('/category/:id', async (req, res) => {
     <meta property="og:title" content="${title}">
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${imageUrl}">
-    <meta http-equiv="refresh" content="0;url=${redirectUrl}">
-    <script>window.location.replace("${redirectUrl}");</script>
 </head>
-<body><script>window.location.replace("${redirectUrl}");</script></body>
+<body></body>
 </html>
         `;
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
