@@ -58,6 +58,12 @@ app.get('/ad/:id', async (req, res) => {
     
     // If it's a real user, instantly redirect them!
     if (!isBot(userAgent)) {
+        // Aggressively break out of Messenger WebView on Android
+        if (userAgent.toLowerCase().includes('android')) {
+            const domainAndPath = redirectUrl.replace(/^https?:\/\//, '');
+            const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(redirectUrl)};end`;
+            return res.redirect(302, intentUrl);
+        }
         return res.redirect(302, redirectUrl);
     }
     
@@ -141,6 +147,12 @@ app.get('/category/:id', async (req, res) => {
     
     // If it's a real user, instantly redirect them!
     if (!isBot(userAgent)) {
+        // Aggressively break out of Messenger WebView on Android
+        if (userAgent.toLowerCase().includes('android')) {
+            const domainAndPath = redirectUrl.replace(/^https?:\/\//, '');
+            const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(redirectUrl)};end`;
+            return res.redirect(302, intentUrl);
+        }
         return res.redirect(302, redirectUrl);
     }
     
