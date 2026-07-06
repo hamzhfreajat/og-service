@@ -330,33 +330,109 @@ app.get('/image/category/:id.jpg', async (req, res) => {
     const { id } = req.params;
     
     try {
-        const response = await axios.get(`${API_BASE}/categories/${id}`, {
+        // Fetch top ads for this category
+        const response = await axios.get(`${API_BASE}/ads?category_id=${id}&limit=10`, {
             headers: { 'Accept': 'application/json' }
         });
         
-        const cat = response.data.data || response.data;
-        const iconUrl = cat.icon || cat.image;
+        const ads = response.data || [];
+        let images = [];
+        
+        for (const ad of ads) {
+            if (images.length >= 4) break;
+            
+            let adImages = [];
+            if (ad.attributes && Array.isArray(ad.attributes.images) && ad.attributes.images.length > 0) {
+                adImages = ad.attributes.images;
+            } else if (ad.image_urls && Array.isArray(ad.image_urls) && ad.image_urls.length > 0) {
+                adImages = ad.image_urls;
+            } else if (ad.image_url && typeof ad.image_url === 'string') {
+                try {
+                    adImages = JSON.parse(ad.image_url);
+                } catch (e) {
+                    adImages = [ad.image_url];
+                }
+            }
+            
+            if (adImages.length > 0) {
+                const imgUrl = typeof adImages[0] === 'string' ? adImages[0] : adImages[0].url || adImages[0].path;
+                if (imgUrl) images.push(imgUrl);
+            }
+        }
 
         const canvas = createCanvas(1200, 630);
         const ctx = canvas.getContext('2d');
         
-        ctx.fillStyle = '#f0f2f5';
+        // Fill background with white
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, 1200, 630);
 
-        if (iconUrl) {
+        if (images.length === 0) {
+            // Fallback to category icon if no ad images found
             try {
-                const img = await loadImage(iconUrl);
-                // Draw icon centered
-                const size = 300;
-                ctx.drawImage(img, 600 - (size/2), 315 - (size/2), size, size);
-            } catch(e) {}
+                const catRes = await axios.get(`${API_BASE}/categories/${id}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const cat = catRes.data.data || catRes.data;
+                const iconUrl = cat.icon || cat.image;
+
+                if (iconUrl) {
+                    try {
+                        const img = await loadImage(iconUrl);
+                        const size = 300;
+                        ctx.drawImage(img, 600 - (size/2), 315 - (size/2), size, size);
+                    } catch(e) {}
+                }
+                
+                ctx.fillStyle = '#00B2FF';
+                ctx.font = 'bold 80px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(cat.name || 'سوقكم', 600, 480);
+            } catch (e) {
+                ctx.fillStyle = '#f0f2f5';
+                ctx.fillRect(0, 0, 1200, 630);
+                ctx.fillStyle = '#00B2FF';
+                ctx.font = 'bold 80px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('سوقكم', 600, 315);
+            }
+        } else {
+            // Draw collage of ad images
+            const numToDraw = Math.min(images.length, 4);
+            const loadedImages = [];
+            
+            for (let i = 0; i < numToDraw; i++) {
+                try {
+                    loadedImages.push(await loadImage(images[i]));
+                } catch (e) {
+                    console.error('Failed to load category image part:', e.message);
+                }
+            }
+
+            const padding = 10;
+            if (loadedImages.length === 1) {
+                drawImageCover(ctx, loadedImages[0], 0, 0, 1200, 630);
+            } else if (loadedImages.length === 2) {
+                const w = (1200 - padding) / 2;
+                drawImageCover(ctx, loadedImages[0], 0, 0, w, 630);
+                drawImageCover(ctx, loadedImages[1], w + padding, 0, w, 630);
+            } else if (loadedImages.length === 3) {
+                const w = (1200 - padding) / 2;
+                const h = (630 - padding) / 2;
+                drawImageCover(ctx, loadedImages[0], 0, 0, w, 630);
+                drawImageCover(ctx, loadedImages[1], w + padding, 0, w, h);
+                drawImageCover(ctx, loadedImages[2], w + padding, h + padding, w, h);
+            } else if (loadedImages.length >= 4) {
+                const w = (1200 - padding) / 2;
+                const h = (630 - padding) / 2;
+                drawImageCover(ctx, loadedImages[0], 0, 0, w, h);
+                drawImageCover(ctx, loadedImages[1], w + padding, 0, w, h);
+                drawImageCover(ctx, loadedImages[2], 0, h + padding, w, h);
+                drawImageCover(ctx, loadedImages[3], w + padding, h + padding, w, h);
+            }
         }
-        
-        ctx.fillStyle = '#00B2FF';
-        ctx.font = 'bold 80px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(cat.name || 'سوقكم', 600, 480);
 
         res.setHeader('Content-Type', 'image/jpeg');
         res.setHeader('Cache-Control', 'public, max-age=604800'); 
@@ -371,8 +447,8 @@ app.get('/image/category/:id.jpg', async (req, res) => {
         ctx.fillStyle = '#00B2FF';
         ctx.font = 'bold 80px sans-serif';
         ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText('سوقكم', 600, 270);
+        ctx.textBaseline = 'middle';
+        ctx.fillText('سوقكم', 600, 315);
         
         res.setHeader('Content-Type', 'image/jpeg');
         emptyCanvas.createJPEGStream({ quality: 0.9 }).pipe(res);
