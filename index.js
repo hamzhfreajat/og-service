@@ -64,36 +64,12 @@ app.get('/ad/:id', async (req, res) => {
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             const imageUrl = `${SHARE_DOMAIN}/image/${id}.jpg`;
-            // Facebook's WebView crashes if we redirect directly to an intent:// URL and the app is not installed.
-            // A known workaround is to simulate a click on an anchor tag with target="_blank".
-            // If the app is installed, the OS intercepts it and opens the app.
-            // If the app is not installed, it fails silently instead of crashing the WebView, allowing our setTimeout to fire.
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.send(`
-                <!DOCTYPE html>
-                <html lang="ar" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>جاري التحويل...</title>
-                </head>
-                <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f0f2f5;">
-                    <h2>جاري التحويل إلى التطبيق...</h2>
-                    
-                    <!-- Fake click target -->
-                    <a id="intent-link" href="${intentUrl}" target="_blank" style="display:none;">Open App</a>
-                    
-                    <script>
-                        // Simulate a click to open in a new context, bypassing WebView's intent block
-                        document.getElementById('intent-link').click();
-                        
-                        // If the app doesn't open within 1.5 seconds, redirect the main window to the Play Store
-                        setTimeout(function() {
-                            window.location.href = "${playStoreUrl}";
-                        }, 1500);
-                    </script>
-                </body>
-                </html>
-            `);
+            // Since Facebook completely blocks intent:// URLs, we rely on Android Verified App Links.
+            // We redirect to the standard HTTPS web URL with a special flag.
+            // If the app is installed, Android OS intercepts this HTTPS URL and opens the app natively.
+            // If the app is NOT installed, Facebook WebView loads the React SPA, which reads the flag and redirects to the Play Store.
+            const fallbackUrl = redirectUrl + (redirectUrl.includes('?') ? '&' : '?') + 'app_fallback=1';
+            return res.redirect(302, fallbackUrl);
         }
         return res.redirect(302, redirectUrl);
     }
@@ -190,36 +166,12 @@ app.get('/category/:id', async (req, res) => {
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             const imageUrl = `${SHARE_DOMAIN}/image/category/${id}.jpg`;
-            // Facebook's WebView crashes if we redirect directly to an intent:// URL and the app is not installed.
-            // A known workaround is to simulate a click on an anchor tag with target="_blank".
-            // If the app is installed, the OS intercepts it and opens the app.
-            // If the app is not installed, it fails silently instead of crashing the WebView, allowing our setTimeout to fire.
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.send(`
-                <!DOCTYPE html>
-                <html lang="ar" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>جاري التحويل...</title>
-                </head>
-                <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f0f2f5;">
-                    <h2>جاري التحويل إلى التطبيق...</h2>
-                    
-                    <!-- Fake click target -->
-                    <a id="intent-link" href="${intentUrl}" target="_blank" style="display:none;">Open App</a>
-                    
-                    <script>
-                        // Simulate a click to open in a new context, bypassing WebView's intent block
-                        document.getElementById('intent-link').click();
-                        
-                        // If the app doesn't open within 1.5 seconds, redirect the main window to the Play Store
-                        setTimeout(function() {
-                            window.location.href = "${playStoreUrl}";
-                        }, 1500);
-                    </script>
-                </body>
-                </html>
-            `);
+            // Since Facebook completely blocks intent:// URLs, we rely on Android Verified App Links.
+            // We redirect to the standard HTTPS web URL with a special flag.
+            // If the app is installed, Android OS intercepts this HTTPS URL and opens the app natively.
+            // If the app is NOT installed, Facebook WebView loads the React SPA, which reads the flag and redirects to the Play Store.
+            const fallbackUrl = redirectUrl + (redirectUrl.includes('?') ? '&' : '?') + 'app_fallback=1';
+            return res.redirect(302, fallbackUrl);
         }
         return res.redirect(302, redirectUrl);
     }
