@@ -64,7 +64,14 @@ app.get('/ad/:id', async (req, res) => {
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             const imageUrl = `${SHARE_DOMAIN}/image/${id}.jpg`;
-            // Use a Javascript-based automatic redirect. It will try the intentUrl first.
+            // If the request came from Facebook/Instagram WebView, it means the Facebook App 
+            // natively tried to open the app (using the al:android tags) and FAILED because the app 
+            // is not installed. So we can safely skip the intent and redirect straight to the Play Store.
+            if (userAgent.includes('FB_IAB') || userAgent.includes('FBAV') || userAgent.includes('Instagram')) {
+                return res.redirect(302, playStoreUrl);
+            }
+
+            // For normal Android browsers (like Chrome), we still try the intentUrl first.
             // If the app doesn't open within 1.5 seconds, it redirects to the Play Store.
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(`
@@ -126,6 +133,12 @@ app.get('/ad/:id', async (req, res) => {
     <meta property="twitter:title" content="${title}">
     <meta property="twitter:description" content="${description}">
     <meta property="twitter:image" content="${imageUrl}">
+    
+    <!-- Native Facebook App Links -->
+    <meta property="al:android:url" content="${redirectUrl}">
+    <meta property="al:android:package" content="com.sooqcom.app">
+    <meta property="al:android:app_name" content="Sooqcom">
+    <meta property="al:web:should_fallback" content="false">
 </head>
 <body></body>
 </html>
@@ -177,7 +190,14 @@ app.get('/category/:id', async (req, res) => {
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             const imageUrl = `${SHARE_DOMAIN}/image/category/${id}.jpg`;
-            // Use a Javascript-based automatic redirect. It will try the intentUrl first.
+            // If the request came from Facebook/Instagram WebView, it means the Facebook App 
+            // natively tried to open the app (using the al:android tags) and FAILED because the app 
+            // is not installed. So we can safely skip the intent and redirect straight to the Play Store.
+            if (userAgent.includes('FB_IAB') || userAgent.includes('FBAV') || userAgent.includes('Instagram')) {
+                return res.redirect(302, playStoreUrl);
+            }
+
+            // For normal Android browsers (like Chrome), we still try the intentUrl first.
             // If the app doesn't open within 1.5 seconds, it redirects to the Play Store.
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(`
@@ -229,6 +249,12 @@ app.get('/category/:id', async (req, res) => {
     <meta property="og:image" content="${imageUrl}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    
+    <!-- Native Facebook App Links -->
+    <meta property="al:android:url" content="${redirectUrl}">
+    <meta property="al:android:package" content="com.sooqcom.app">
+    <meta property="al:android:app_name" content="Sooqcom">
+    <meta property="al:web:should_fallback" content="false">
 </head>
 <body></body>
 </html>
