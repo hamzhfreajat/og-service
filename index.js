@@ -111,7 +111,7 @@ app.get('/ad/:id', async (req, res) => {
     <meta property="twitter:image" content="${imageUrl}">
     
     <!-- Native Facebook App Links -->
-    <meta property="al:android:url" content="${redirectUrl}">
+    <meta property="al:android:url" content="sooqcom://ad/${id}">
     <meta property="al:android:package" content="com.sooqcom.app">
     <meta property="al:android:app_name" content="Sooqcom">
     <meta property="al:web:should_fallback" content="false">
@@ -203,7 +203,7 @@ app.get('/category/:id', async (req, res) => {
     <meta property="og:image:height" content="630">
     
     <!-- Native Facebook App Links -->
-    <meta property="al:android:url" content="${redirectUrl}">
+    <meta property="al:android:url" content="sooqcom://category/${id}">
     <meta property="al:android:package" content="com.sooqcom.app">
     <meta property="al:android:app_name" content="Sooqcom">
     <meta property="al:web:should_fallback" content="false">
