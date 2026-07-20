@@ -64,33 +64,28 @@ app.get('/ad/:id', async (req, res) => {
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             const imageUrl = `${SHARE_DOMAIN}/image/${id}.jpg`;
-            // If the request came from Facebook/Instagram WebView, it means the Facebook App 
-            // natively tried to open the app (using the al:android tags) and FAILED because the app 
-            // is not installed. So we can safely skip the intent and redirect straight to the Play Store.
-            if (userAgent.includes('FB_IAB') || userAgent.includes('FBAV') || userAgent.includes('Instagram')) {
-                return res.redirect(302, playStoreUrl);
-            }
-
-            // For normal Android browsers (like Chrome), we still try the intentUrl first.
-            // If the app doesn't open within 1.5 seconds, it redirects to the Play Store.
+            // Try to open the app using a hidden iframe. This prevents Facebook's WebView
+            // from crashing the entire page if the app is not installed.
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(`
                 <!DOCTYPE html>
-                <html>
+                <html lang="ar" dir="rtl">
                 <head>
+                    <meta charset="UTF-8">
                     <title>جاري التحويل...</title>
+                </head>
+                <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f0f2f5;">
+                    <h2>جاري التحويل إلى التطبيق...</h2>
+                    <iframe id="app-iframe" style="display:none;"></iframe>
                     <script>
-                        // Try to open the App using the intent
-                        window.location.href = "${intentUrl}";
+                        // The iframe attempts to trigger the intent without navigating the main page
+                        document.getElementById('app-iframe').src = "${intentUrl}";
                         
-                        // If it fails or the app is not installed, redirect to Play Store after 1.5 seconds
+                        // If the app doesn't take over the screen within 1.5 seconds, redirect to Play Store
                         setTimeout(function() {
                             window.location.href = "${playStoreUrl}";
                         }, 1500);
                     </script>
-                </head>
-                <body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-                    <h2>جاري التحويل إلى التطبيق...</h2>
                 </body>
                 </html>
             `);
@@ -192,31 +187,28 @@ app.get('/category/:id', async (req, res) => {
             const imageUrl = `${SHARE_DOMAIN}/image/category/${id}.jpg`;
             // If the request came from Facebook/Instagram WebView, it means the Facebook App 
             // natively tried to open the app (using the al:android tags) and FAILED because the app 
-            // is not installed. So we can safely skip the intent and redirect straight to the Play Store.
-            if (userAgent.includes('FB_IAB') || userAgent.includes('FBAV') || userAgent.includes('Instagram')) {
-                return res.redirect(302, playStoreUrl);
-            }
-
-            // For normal Android browsers (like Chrome), we still try the intentUrl first.
-            // If the app doesn't open within 1.5 seconds, it redirects to the Play Store.
+            // Try to open the app using a hidden iframe. This prevents Facebook's WebView
+            // from crashing the entire page if the app is not installed.
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(`
                 <!DOCTYPE html>
-                <html>
+                <html lang="ar" dir="rtl">
                 <head>
+                    <meta charset="UTF-8">
                     <title>جاري التحويل...</title>
+                </head>
+                <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f0f2f5;">
+                    <h2>جاري التحويل إلى التطبيق...</h2>
+                    <iframe id="app-iframe" style="display:none;"></iframe>
                     <script>
-                        // Try to open the App using the intent
-                        window.location.href = "${intentUrl}";
+                        // The iframe attempts to trigger the intent without navigating the main page
+                        document.getElementById('app-iframe').src = "${intentUrl}";
                         
-                        // If it fails or the app is not installed, redirect to Play Store after 1.5 seconds
+                        // If the app doesn't take over the screen within 1.5 seconds, redirect to Play Store
                         setTimeout(function() {
                             window.location.href = "${playStoreUrl}";
                         }, 1500);
                     </script>
-                </head>
-                <body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-                    <h2>جاري التحويل إلى التطبيق...</h2>
                 </body>
                 </html>
             `);
