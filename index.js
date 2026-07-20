@@ -64,31 +64,10 @@ app.get('/ad/:id', async (req, res) => {
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             const imageUrl = `${SHARE_DOMAIN}/image/${id}.jpg`;
-            // Try to open the app using a hidden iframe. This prevents Facebook's WebView
-            // from crashing the entire page if the app is not installed.
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.send(`
-                <!DOCTYPE html>
-                <html lang="ar" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>جاري التحويل...</title>
-                </head>
-                <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f0f2f5;">
-                    <h2>جاري التحويل إلى التطبيق...</h2>
-                    <iframe id="app-iframe" style="display:none;"></iframe>
-                    <script>
-                        // The iframe attempts to trigger the intent without navigating the main page
-                        document.getElementById('app-iframe').src = "${intentUrl}";
-                        
-                        // If the app doesn't take over the screen within 1.5 seconds, redirect to Play Store
-                        setTimeout(function() {
-                            window.location.href = "${playStoreUrl}";
-                        }, 1500);
-                    </script>
-                </body>
-                </html>
-            `);
+            // The user explicitly requested an automatic redirect without any buttons or timeouts, 
+            // even if it means users without the app will experience a white crash screen on Facebook.
+            // This will immediately trigger the Android OS to open the app if installed.
+            return res.redirect(302, intentUrl);
         }
         return res.redirect(302, redirectUrl);
     }
@@ -185,33 +164,10 @@ app.get('/category/:id', async (req, res) => {
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
             const imageUrl = `${SHARE_DOMAIN}/image/category/${id}.jpg`;
-            // If the request came from Facebook/Instagram WebView, it means the Facebook App 
-            // natively tried to open the app (using the al:android tags) and FAILED because the app 
-            // Try to open the app using a hidden iframe. This prevents Facebook's WebView
-            // from crashing the entire page if the app is not installed.
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.send(`
-                <!DOCTYPE html>
-                <html lang="ar" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>جاري التحويل...</title>
-                </head>
-                <body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #f0f2f5;">
-                    <h2>جاري التحويل إلى التطبيق...</h2>
-                    <iframe id="app-iframe" style="display:none;"></iframe>
-                    <script>
-                        // The iframe attempts to trigger the intent without navigating the main page
-                        document.getElementById('app-iframe').src = "${intentUrl}";
-                        
-                        // If the app doesn't take over the screen within 1.5 seconds, redirect to Play Store
-                        setTimeout(function() {
-                            window.location.href = "${playStoreUrl}";
-                        }, 1500);
-                    </script>
-                </body>
-                </html>
-            `);
+            // The user explicitly requested an automatic redirect without any buttons or timeouts, 
+            // even if it means users without the app will experience a white crash screen on Facebook.
+            // This will immediately trigger the Android OS to open the app if installed.
+            return res.redirect(302, intentUrl);
         }
         return res.redirect(302, redirectUrl);
     }
