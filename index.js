@@ -63,7 +63,54 @@ app.get('/ad/:id', async (req, res) => {
             const domainAndPath = redirectUrl.replace(/^https?:\/\//, '');
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
-            return res.redirect(302, intentUrl);
+            const imageUrl = `${SHARE_DOMAIN}/image/${id}.jpg`;
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            return res.send(`
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                    <title>تطبيق سوقكم</title>
+                    <style>
+                        body {
+                            margin: 0; padding: 0; font-family: sans-serif; height: 100vh;
+                            display: flex; flex-direction: column; justify-content: flex-end;
+                            background: url('${imageUrl}') no-repeat center center fixed;
+                            background-size: cover; position: relative; overflow: hidden;
+                        }
+                        body::before {
+                            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+                            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); z-index: 1;
+                        }
+                        .bottom-sheet {
+                            position: relative; z-index: 2; background: white;
+                            border-top-left-radius: 24px; border-top-right-radius: 24px;
+                            padding: 25px 20px 40px; text-align: center;
+                            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+                            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                        }
+                        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+                        .logo { width: 80px; height: 80px; border-radius: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+                        h2 { color: #333; margin: 0 0 8px 0; font-size: 22px; }
+                        p { color: #666; margin: 0 0 25px 0; font-size: 15px; line-height: 1.5; }
+                        .btn-primary { display: block; width: 100%; padding: 16px; background: #00B2FF; color: white; text-decoration: none; border-radius: 14px; font-size: 18px; font-weight: bold; margin-bottom: 12px; box-sizing: border-box; }
+                        .btn-secondary { display: block; width: 100%; padding: 16px; background: #f0f2f5; color: #333; text-decoration: none; border-radius: 14px; font-size: 18px; font-weight: bold; box-sizing: border-box; }
+                        .handle { width: 40px; height: 5px; background: #e0e0e0; border-radius: 3px; margin: 0 auto 20px auto; }
+                    </style>
+                </head>
+                <body>
+                    <div class="bottom-sheet">
+                        <div class="handle"></div>
+                        <img class="logo" src="https://sooq-com.com/assets/favicon/favicon-180.png" alt="Sooqcom">
+                        <h2>أكمل في التطبيق</h2>
+                        <p>لمشاهدة التفاصيل والصور والتواصل مع المعلن، يرجى المتابعة من خلال تطبيق سوقكم.</p>
+                        <a href="${intentUrl}" class="btn-primary">فتح التطبيق</a>
+                        <a href="${playStoreUrl}" class="btn-secondary">تحميل التطبيق</a>
+                    </div>
+                </body>
+                </html>
+            `);
         }
         return res.redirect(302, redirectUrl);
     }
@@ -153,7 +200,54 @@ app.get('/category/:id', async (req, res) => {
             const domainAndPath = redirectUrl.replace(/^https?:\/\//, '');
             const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
             const intentUrl = `intent://${domainAndPath}#Intent;scheme=https;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
-            return res.redirect(302, intentUrl);
+            const imageUrl = `${SHARE_DOMAIN}/image/category/${id}.jpg`;
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            return res.send(`
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                    <title>تطبيق سوقكم</title>
+                    <style>
+                        body {
+                            margin: 0; padding: 0; font-family: sans-serif; height: 100vh;
+                            display: flex; flex-direction: column; justify-content: flex-end;
+                            background: url('${imageUrl}') no-repeat center center fixed;
+                            background-size: cover; position: relative; overflow: hidden;
+                        }
+                        body::before {
+                            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+                            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); z-index: 1;
+                        }
+                        .bottom-sheet {
+                            position: relative; z-index: 2; background: white;
+                            border-top-left-radius: 24px; border-top-right-radius: 24px;
+                            padding: 25px 20px 40px; text-align: center;
+                            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+                            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                        }
+                        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+                        .logo { width: 80px; height: 80px; border-radius: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+                        h2 { color: #333; margin: 0 0 8px 0; font-size: 22px; }
+                        p { color: #666; margin: 0 0 25px 0; font-size: 15px; line-height: 1.5; }
+                        .btn-primary { display: block; width: 100%; padding: 16px; background: #00B2FF; color: white; text-decoration: none; border-radius: 14px; font-size: 18px; font-weight: bold; margin-bottom: 12px; box-sizing: border-box; }
+                        .btn-secondary { display: block; width: 100%; padding: 16px; background: #f0f2f5; color: #333; text-decoration: none; border-radius: 14px; font-size: 18px; font-weight: bold; box-sizing: border-box; }
+                        .handle { width: 40px; height: 5px; background: #e0e0e0; border-radius: 3px; margin: 0 auto 20px auto; }
+                    </style>
+                </head>
+                <body>
+                    <div class="bottom-sheet">
+                        <div class="handle"></div>
+                        <img class="logo" src="https://sooq-com.com/assets/favicon/favicon-180.png" alt="Sooqcom">
+                        <h2>أكمل في التطبيق</h2>
+                        <p>لمشاهدة الإعلانات وتصفح الأقسام، يرجى المتابعة من خلال تطبيق سوقكم.</p>
+                        <a href="${intentUrl}" class="btn-primary">فتح التطبيق</a>
+                        <a href="${playStoreUrl}" class="btn-secondary">تحميل التطبيق</a>
+                    </div>
+                </body>
+                </html>
+            `);
         }
         return res.redirect(302, redirectUrl);
     }
