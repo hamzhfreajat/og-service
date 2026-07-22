@@ -89,7 +89,7 @@ app.get('/ad/:id', async (req, res) => {
         const isAndroid = ua.includes('android');
         const deepLinkPath = `ad/${id}${queryString}`;
         const customSchemeUrl = `sooqcom://${deepLinkPath}`;
-        const appStoreUrl = 'https://apps.apple.com/app/id6785620545';
+        const appStoreUrl = 'https://apps.apple.com/app/sooqcom-%D8%B3%D9%88%D9%82%D9%83%D9%85/id6785620545';
         const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
         const intentUrl = `intent://${deepLinkPath}#Intent;scheme=sooqcom;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
 
