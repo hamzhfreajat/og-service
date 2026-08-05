@@ -129,8 +129,8 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
 <p>سيتم فتح الإعلان في التطبيق</p>
 </div>
 <script>
-// Step 1: Try to open the app via custom scheme
-window.location.href='${customSchemeUrl}';
+// Step 1: Try to open app via hidden iframe (fails silently if not installed)
+try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
 // Step 2: If app not installed, go to App Store after 1.5 seconds
 setTimeout(function(){window.location.href='${appStoreUrl}'},1500);
 </script></body></html>`;
@@ -280,7 +280,7 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
 <p>سيتم فتح القسم في التطبيق</p>
 </div>
 <script>
-window.location.href='${customSchemeUrl}';
+try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
 setTimeout(function(){window.location.href='${appStoreUrl}'},1500);
 </script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
