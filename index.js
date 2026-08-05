@@ -103,7 +103,7 @@ app.get('/ad/:id', async (req, res) => {
         }
 
         if (isIOS) {
-            const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم تحويلك إلى المتجر</p><div class="spinner"></div></div><script>window.location.href = "${appStoreUrl}";</script></body></html>`;
+            const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم تحويلك إلى المتجر</p><div class="spinner"></div></div><script>var storeUrl = "${appStoreUrl}".replace("https://", "itms-apps://"); window.location.replace(storeUrl);</script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
@@ -227,7 +227,7 @@ app.get('/category/:id', async (req, res) => {
         }
 
         if (isIOS) {
-            const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم تحويلك إلى المتجر</p><div class="spinner"></div></div><script>window.location.href = "${appStoreUrl}";</script></body></html>`;
+            const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم تحويلك إلى المتجر</p><div class="spinner"></div></div><script>var storeUrl = "${appStoreUrl}".replace("https://", "itms-apps://"); window.location.replace(storeUrl);</script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
