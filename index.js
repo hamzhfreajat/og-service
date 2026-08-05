@@ -119,23 +119,7 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
         }
 
         if (isIOS) {
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>جاري فتح سوقكم...</title>
-<style>${pageStyle}</style></head>
-<body><div class="container">
-<div class="logo">S</div>
-<div class="spinner"></div>
-<h1>جاري فتح سوقكم...</h1>
-<p>سيتم فتح الإعلان في التطبيق</p>
-</div>
-<script>
-// Step 1: Try to open app via hidden iframe (fails silently if not installed)
-try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-// Step 2: If app not installed, go to App Store after 1.5 seconds
-setTimeout(function(){window.location.href='${appStoreUrl}'},1500);
-</script></body></html>`;
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.send(html);
+            return res.redirect(302, appStoreUrl);
         }
 
         // Desktop or unknown - redirect to Website
@@ -270,21 +254,7 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
         }
 
         if (isIOS) {
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>جاري فتح سوقكم...</title>
-<style>${pageStyle}</style></head>
-<body><div class="container">
-<div class="logo">S</div>
-<div class="spinner"></div>
-<h1>جاري فتح سوقكم...</h1>
-<p>سيتم فتح القسم في التطبيق</p>
-</div>
-<script>
-try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-setTimeout(function(){window.location.href='${appStoreUrl}'},1500);
-</script></body></html>`;
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.send(html);
+            return res.redirect(302, appStoreUrl);
         }
 
         return res.redirect(302, redirectUrl);
