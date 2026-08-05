@@ -119,7 +119,9 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
         }
 
         if (isIOS) {
-            return res.redirect(302, appStoreUrl);
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=${appStoreUrl}"><title>سوقكم</title></head><body></body></html>`;
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            return res.send(html);
         }
 
         // Desktop or unknown - redirect to Website
@@ -254,7 +256,9 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
         }
 
         if (isIOS) {
-            return res.redirect(302, appStoreUrl);
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=${appStoreUrl}"><title>سوقكم</title></head><body></body></html>`;
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            return res.send(html);
         }
 
         return res.redirect(302, redirectUrl);
