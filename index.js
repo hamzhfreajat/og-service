@@ -97,6 +97,14 @@ app.get('/ad/:id', async (req, res) => {
         const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem;max-width:400px}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}#fallback{display:none;margin-top:2rem}#fallback a{color:#00B2FF;text-decoration:none;font-size:0.85rem}`;
 
         if (isAndroid) {
+            const isMessenger = ua.includes('fb') || ua.includes('messenger') || ua.includes('instagram');
+            
+            // For Facebook/Messenger on Android, try a direct HTTP 302 redirect first
+            // This is the only remaining way to potentially bypass their strict JS blocks.
+            if (isMessenger && !req.query.noforward) {
+                return res.redirect(302, intentUrl);
+            }
+            
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>جاري فتح سوقكم...</title>
 <style>${pageStyle}</style></head>
@@ -260,6 +268,10 @@ app.get('/category/:id', async (req, res) => {
             const deepLinkPath = `category/${id}${queryString}`;
             const customSchemeUrl = `sooqcom://${deepLinkPath}`;
             const intentUrl = `intent://${deepLinkPath}#Intent;scheme=sooqcom;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
+            
+            if (!req.query.noforward) {
+                return res.redirect(302, intentUrl);
+            }
             
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>جاري فتح التطبيق...</title>
