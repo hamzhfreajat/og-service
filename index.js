@@ -119,11 +119,18 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
         }
 
         if (isIOS) {
+            const itunesUrl = appStoreUrl.replace('https://apps.apple.com', 'itms-apps://apps.apple.com');
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="refresh" content="1;url=${appStoreUrl}">
 <title>سوقكم</title>
 <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;font-size:0.95rem}</style></head>
 <body><div class="container"><div class="logo">S</div><h1>جاري فتح سوقكم...</h1><p>سيتم التحويل للمتجر</p></div>
-<script>window.location.href='${appStoreUrl}';</script>
+<script>
+try{location.replace('${itunesUrl}')}catch(e){}
+setTimeout(function(){try{top.location.href='${appStoreUrl}'}catch(e){}},300);
+setTimeout(function(){try{window.open('${appStoreUrl}','_blank')}catch(e){}},600);
+setTimeout(function(){try{window.location.href='${appStoreUrl}'}catch(e){}},900);
+</script>
 </body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
@@ -261,11 +268,18 @@ setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
         }
 
         if (isIOS) {
+            const itunesUrl = appStoreUrl.replace('https://apps.apple.com', 'itms-apps://apps.apple.com');
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="refresh" content="1;url=${appStoreUrl}">
 <title>سوقكم</title>
 <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;font-size:0.95rem}</style></head>
 <body><div class="container"><div class="logo">S</div><h1>جاري فتح سوقكم...</h1><p>سيتم التحويل للمتجر</p></div>
-<script>window.location.href='${appStoreUrl}';</script>
+<script>
+try{location.replace('${itunesUrl}')}catch(e){}
+setTimeout(function(){try{top.location.href='${appStoreUrl}'}catch(e){}},300);
+setTimeout(function(){try{window.open('${appStoreUrl}','_blank')}catch(e){}},600);
+setTimeout(function(){try{window.location.href='${appStoreUrl}'}catch(e){}},900);
+</script>
 </body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
