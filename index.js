@@ -97,38 +97,13 @@ app.get('/ad/:id', async (req, res) => {
         const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem;max-width:400px}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}`;
 
         if (isAndroid) {
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>جاري فتح سوقكم...</title>
-<style>${pageStyle}</style></head>
-<body><div class="container">
-<div class="logo">S</div>
-<div class="spinner"></div>
-<h1>جاري فتح سوقكم...</h1>
-<p>سيتم فتح الإعلان في التطبيق</p>
-</div>
-<script>
-// Step 1: Try to open the app via custom scheme (hidden iframe)
-try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-// Step 2: Try intent URL (works in Chrome, handles fallback to Play Store automatically)
-setTimeout(function(){try{window.location.href='${intentUrl}'}catch(e){}},400);
-// Step 3: If nothing worked after 2 seconds, go to Play Store
-setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
-</script></body></html>`;
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم فتح الإعلان في التطبيق</p><div class="spinner"></div><a href="${intentUrl}" style="background:#00B2FF;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-block">فتح يدويًا</a></div><script>window.location.href = "${intentUrl}";</script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
 
         if (isIOS) {
-            const itunesUrl = appStoreUrl.replace('https://apps.apple.com', 'itms-apps://apps.apple.com');
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>سوقكم</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;font-size:0.95rem}</style></head>
-<body><div class="container"><div class="logo">S</div><h1>جاري فتح سوقكم...</h1><p>سيتم فتح الإعلان</p></div>
-<script>
-try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-setTimeout(function(){try{location.replace('${itunesUrl}')}catch(e){}},1500);
-</script>
-</body></html>`;
+            const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم فتح الإعلان في التطبيق</p><div class="spinner"></div><a href="${customSchemeUrl}" id="manualBtn" style="background:#00B2FF;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-block">فتح يدويًا</a></div><script>window.location.href = "${customSchemeUrl}"; setTimeout(() => { if (!document.hidden) window.location.href = "${appStoreUrl}"; }, 2000);</script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
@@ -246,37 +221,13 @@ app.get('/category/:id', async (req, res) => {
         const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}`;
 
         if (isAndroid) {
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>جاري فتح سوقكم...</title>
-<style>${pageStyle}</style></head>
-<body><div class="container">
-<div class="logo">S</div>
-<div class="spinner"></div>
-<h1>جاري فتح سوقكم...</h1>
-<p>سيتم فتح القسم في التطبيق</p>
-</div>
-<script>
-try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-setTimeout(function(){try{window.location.href='${intentUrl}'}catch(e){}},400);
-setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
-</script></body></html>`;
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم فتح القسم في التطبيق</p><div class="spinner"></div><a href="${intentUrl}" style="background:#00B2FF;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-block">فتح يدويًا</a></div><script>window.location.href = "${intentUrl}";</script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
 
         if (isIOS) {
-            const itunesUrl = appStoreUrl.replace('https://apps.apple.com', 'itms-apps://apps.apple.com');
-            const deepLinkPath = `category/${id}${queryString}`;
-            const customSchemeUrl2 = `sooqcom://${deepLinkPath}`;
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>سوقكم</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;font-size:0.95rem}</style></head>
-<body><div class="container"><div class="logo">S</div><h1>جاري فتح سوقكم...</h1><p>سيتم فتح القسم</p></div>
-<script>
-try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl2}';document.body.appendChild(f)}catch(e){}
-setTimeout(function(){try{location.replace('${itunesUrl}')}catch(e){}},1500);
-</script>
-</body></html>`;
+            const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سوقكم</title><style>${pageStyle}</style></head><body><div class="container"><div class="logo">س</div><h1>جاري فتح سوقكم...</h1><p>سيتم فتح القسم في التطبيق</p><div class="spinner"></div><a href="${customSchemeUrl}" id="manualBtn" style="background:#00B2FF;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-block">فتح يدويًا</a></div><script>window.location.href = "${customSchemeUrl}"; setTimeout(() => { if (!document.hidden) window.location.href = "${appStoreUrl}"; }, 2000);</script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
