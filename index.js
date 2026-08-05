@@ -109,7 +109,14 @@ app.get('/ad/:id', async (req, res) => {
 </div>
 <script>
 try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-setTimeout(function(){try{window.location.href='${intentUrl}'}catch(e){}},500);
+setTimeout(function(){
+    try {
+        var a = document.createElement('a');
+        a.href = '${intentUrl}';
+        document.body.appendChild(a);
+        a.click();
+    } catch(e) {}
+}, 500);
 setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
 </script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -128,7 +135,14 @@ setTimeout(function(){document.getElementById('fallback').style.display='block';
 <div id="fallback"><a href="${appStoreUrl}">اضغط هنا لفتح المتجر أو التطبيق يدوياً</a></div>
 </div>
 <script>
-window.location.href='${customSchemeUrl}';
+try {
+    var a = document.createElement('a');
+    a.href = '${customSchemeUrl}';
+    document.body.appendChild(a);
+    a.click();
+} catch(e) {
+    window.location.href='${customSchemeUrl}';
+}
 setTimeout(function(){window.location.href='${appStoreUrl}'},2000);
 setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
 </script></body></html>`;
@@ -260,8 +274,15 @@ app.get('/category/:id', async (req, res) => {
 <script>
 // Method 1: Try custom scheme via hidden iframe (works in some WebViews)
 try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-// Method 2: Try intent:// via window.location (works in Chrome Custom Tabs)
-setTimeout(function(){try{window.location.href='${intentUrl}'}catch(e){}},300);
+// Method 2: Try intent:// via fake click
+setTimeout(function(){
+    try {
+        var a = document.createElement('a');
+        a.href = '${intentUrl}';
+        document.body.appendChild(a);
+        a.click();
+    } catch(e) {}
+}, 300);
 // Method 3: Show manual link after 3 seconds if nothing worked
 setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
 </script></body></html>`;
@@ -287,8 +308,15 @@ setTimeout(function(){document.getElementById('fallback').style.display='block';
 <div id="fallback"><a href="${appStoreUrl}">اضغط هنا إذا لم يفتح التطبيق تلقائياً</a></div>
 </div>
 <script>
-// Try custom scheme on iOS
-window.location.href='${customSchemeUrl}';
+// Try custom scheme on iOS via fake click
+try {
+    var a = document.createElement('a');
+    a.href = '${customSchemeUrl}';
+    document.body.appendChild(a);
+    a.click();
+} catch(e) {
+    window.location.href='${customSchemeUrl}';
+}
 // Show fallback after 3 seconds
 setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
 </script></body></html>`;
