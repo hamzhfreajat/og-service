@@ -94,17 +94,9 @@ app.get('/ad/:id', async (req, res) => {
         const intentUrl = `intent://${deepLinkPath}#Intent;scheme=sooqcom;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
 
         // Common styles for the loading page
-        const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem;max-width:400px}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}#fallback{display:none;margin-top:2rem}#fallback a{color:#00B2FF;text-decoration:none;font-size:0.85rem}`;
+        const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem;max-width:400px}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}`;
 
         if (isAndroid) {
-            const isMessenger = ua.includes('fb') || ua.includes('messenger') || ua.includes('instagram');
-            
-            // For Facebook/Messenger on Android, try a direct HTTP 302 redirect first
-            // This is the only remaining way to potentially bypass their strict JS blocks.
-            if (isMessenger && !req.query.noforward) {
-                return res.redirect(302, intentUrl);
-            }
-            
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>جاري فتح سوقكم...</title>
 <style>${pageStyle}</style></head>
@@ -113,19 +105,14 @@ app.get('/ad/:id', async (req, res) => {
 <div class="spinner"></div>
 <h1>جاري فتح سوقكم...</h1>
 <p>سيتم فتح الإعلان في التطبيق</p>
-<div id="fallback"><a href="${playStoreUrl}">اضغط هنا لفتح المتجر أو التطبيق يدوياً</a></div>
 </div>
 <script>
+// Step 1: Try to open the app via custom scheme (hidden iframe)
 try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-setTimeout(function(){
-    try {
-        var a = document.createElement('a');
-        a.href = '${intentUrl}';
-        document.body.appendChild(a);
-        a.click();
-    } catch(e) {}
-}, 500);
-setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
+// Step 2: Try intent URL (works in Chrome, handles fallback to Play Store automatically)
+setTimeout(function(){try{window.location.href='${intentUrl}'}catch(e){}},400);
+// Step 3: If nothing worked after 2 seconds, go to Play Store
+setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
 </script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
@@ -140,19 +127,12 @@ setTimeout(function(){document.getElementById('fallback').style.display='block';
 <div class="spinner"></div>
 <h1>جاري فتح سوقكم...</h1>
 <p>سيتم فتح الإعلان في التطبيق</p>
-<div id="fallback"><a href="${appStoreUrl}">اضغط هنا لفتح المتجر أو التطبيق يدوياً</a></div>
 </div>
 <script>
-try {
-    var a = document.createElement('a');
-    a.href = '${customSchemeUrl}';
-    document.body.appendChild(a);
-    a.click();
-} catch(e) {
-    window.location.href='${customSchemeUrl}';
-}
-setTimeout(function(){window.location.href='${appStoreUrl}'},2000);
-setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
+// Step 1: Try to open the app via custom scheme
+window.location.href='${customSchemeUrl}';
+// Step 2: If app not installed, go to App Store after 1.5 seconds
+setTimeout(function(){window.location.href='${appStoreUrl}'},1500);
 </script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
@@ -260,82 +240,53 @@ app.get('/category/:id', async (req, res) => {
     
     // If it's a real user, instantly redirect them!
     if (!isBot(userAgent)) {
-        // Facebook/Messenger/Instagram WebView on Android does NOT honor Android App Links.
-        // We use multiple fallback methods to maximize compatibility.
-        if (userAgent.toLowerCase().includes('android') && 
-            (userAgent.toLowerCase().includes('fb') || userAgent.toLowerCase().includes('messenger') || userAgent.toLowerCase().includes('instagram'))) {
-            const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
-            const deepLinkPath = `category/${id}${queryString}`;
-            const customSchemeUrl = `sooqcom://${deepLinkPath}`;
-            const intentUrl = `intent://${deepLinkPath}#Intent;scheme=sooqcom;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
-            
-            if (!req.query.noforward) {
-                return res.redirect(302, intentUrl);
-            }
-            
+        const ua = userAgent.toLowerCase();
+        const isAndroid = ua.includes('android');
+        const isIOS = ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod');
+        const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.sooqcom.app';
+        const appStoreUrl = 'https://apps.apple.com/app/sooqcom-%D8%B3%D9%88%D9%82%D9%83%D9%85/id6785620545';
+        const deepLinkPath = `category/${id}${queryString}`;
+        const customSchemeUrl = `sooqcom://${deepLinkPath}`;
+        const intentUrl = `intent://${deepLinkPath}#Intent;scheme=sooqcom;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
+        const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}`;
+
+        if (isAndroid) {
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>جاري فتح التطبيق...</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}#fallback{display:none;margin-top:2rem}#fallback a{color:#00B2FF;text-decoration:none;font-size:0.85rem}</style></head>
+<title>جاري فتح سوقكم...</title>
+<style>${pageStyle}</style></head>
 <body><div class="container">
 <div class="logo">S</div>
 <div class="spinner"></div>
 <h1>جاري فتح سوقكم...</h1>
 <p>سيتم فتح القسم في التطبيق</p>
-<div id="fallback"><a href="${intentUrl}">اضغط هنا إذا لم يفتح التطبيق تلقائياً</a></div>
 </div>
 <script>
-// Method 1: Try custom scheme via hidden iframe (works in some WebViews)
 try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-// Method 2: Try intent:// via fake click
-setTimeout(function(){
-    try {
-        var a = document.createElement('a');
-        a.href = '${intentUrl}';
-        document.body.appendChild(a);
-        a.click();
-    } catch(e) {}
-}, 300);
-// Method 3: Show manual link after 3 seconds if nothing worked
-setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
+setTimeout(function(){try{window.location.href='${intentUrl}'}catch(e){}},400);
+setTimeout(function(){window.location.href='${playStoreUrl}'},2000);
 </script></body></html>`;
-            
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
-        // iOS Facebook/Messenger/Instagram WebView
-        if (userAgent.toLowerCase().includes('iphone') && 
-            (userAgent.toLowerCase().includes('fb') || userAgent.toLowerCase().includes('messenger') || userAgent.toLowerCase().includes('instagram'))) {
-            const appStoreUrl = 'https://apps.apple.com/app/sooqcom/id6740043498';
-            const deepLinkPath = `category/${id}${queryString}`;
-            const customSchemeUrl = `sooqcom://${deepLinkPath}`;
-            
+
+        if (isIOS) {
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>جاري فتح التطبيق...</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}#fallback{display:none;margin-top:2rem}#fallback a{color:#00B2FF;text-decoration:none;font-size:0.85rem}</style></head>
+<title>جاري فتح سوقكم...</title>
+<style>${pageStyle}</style></head>
 <body><div class="container">
 <div class="logo">S</div>
 <div class="spinner"></div>
 <h1>جاري فتح سوقكم...</h1>
 <p>سيتم فتح القسم في التطبيق</p>
-<div id="fallback"><a href="${appStoreUrl}">اضغط هنا إذا لم يفتح التطبيق تلقائياً</a></div>
 </div>
 <script>
-// Try custom scheme on iOS via fake click
-try {
-    var a = document.createElement('a');
-    a.href = '${customSchemeUrl}';
-    document.body.appendChild(a);
-    a.click();
-} catch(e) {
-    window.location.href='${customSchemeUrl}';
-}
-// Show fallback after 3 seconds
-setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
+window.location.href='${customSchemeUrl}';
+setTimeout(function(){window.location.href='${appStoreUrl}'},1500);
 </script></body></html>`;
-            
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
+
         return res.redirect(302, redirectUrl);
     }
     
