@@ -94,7 +94,7 @@ app.get('/ad/:id', async (req, res) => {
         const intentUrl = `intent://${deepLinkPath}#Intent;scheme=sooqcom;package=com.sooqcom.app;S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
 
         // Common styles for the loading page
-        const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem;max-width:400px}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}`;
+        const pageStyle = `*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a3a5c 100%);color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;direction:rtl}.container{padding:2rem;max-width:400px}.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:#00B2FF;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;color:#fff}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#8899aa;margin-bottom:1.5rem;font-size:0.95rem}.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00B2FF;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}@keyframes spin{to{transform:rotate(360deg)}}#fallback{display:none;margin-top:2rem}#fallback a{color:#00B2FF;text-decoration:none;font-size:0.85rem}`;
 
         if (isAndroid) {
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -105,10 +105,12 @@ app.get('/ad/:id', async (req, res) => {
 <div class="spinner"></div>
 <h1>جاري فتح سوقكم...</h1>
 <p>سيتم فتح الإعلان في التطبيق</p>
+<div id="fallback"><a href="${playStoreUrl}">اضغط هنا لفتح المتجر أو التطبيق يدوياً</a></div>
 </div>
 <script>
 try{var f=document.createElement('iframe');f.style.display='none';f.src='${customSchemeUrl}';document.body.appendChild(f)}catch(e){}
-setTimeout(function(){window.location.href='${intentUrl}'},500);
+setTimeout(function(){try{window.location.href='${intentUrl}'}catch(e){}},500);
+setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
 </script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
@@ -123,17 +125,19 @@ setTimeout(function(){window.location.href='${intentUrl}'},500);
 <div class="spinner"></div>
 <h1>جاري فتح سوقكم...</h1>
 <p>سيتم فتح الإعلان في التطبيق</p>
+<div id="fallback"><a href="${appStoreUrl}">اضغط هنا لفتح المتجر أو التطبيق يدوياً</a></div>
 </div>
 <script>
 window.location.href='${customSchemeUrl}';
 setTimeout(function(){window.location.href='${appStoreUrl}'},2000);
+setTimeout(function(){document.getElementById('fallback').style.display='block';document.querySelector('.spinner').style.display='none'},3000);
 </script></body></html>`;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.send(html);
         }
 
-        // Desktop or unknown - redirect to App Store
-        return res.redirect(302, appStoreUrl);
+        // Desktop or unknown - redirect to Website
+        return res.redirect(302, redirectUrl);
     }
     
     try {
